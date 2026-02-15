@@ -19,7 +19,7 @@
 /* 
 Please specify the group members here
 
-# Student #1: 
+# Student #1: Aayusha Kandel
 # Student #2:
 # Student #3: 
 
