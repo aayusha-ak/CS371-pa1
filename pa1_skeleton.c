@@ -75,15 +75,15 @@ void *client_thread_func(void *arg) {
     // Register this thread's socket with its epoll instance
     memset(&client_event, 0, sizeof(client_event)); // clear event struct
     client_event.events = EPOLLIN; //notify when socket is readable
-    client_event.data.fd = data->socket_fd; // identify which fd triggered event
+    client_event.data.fd = data->socket_fd; // identify whuch fd triggered event
 
-    //Add socket to the thread's epoll instance
+    //Add socket to this thread's epoll instance
     if (epoll_ctl(data->epoll_fd, EPOLL_CTL_ADD, data->socket_fd, &client_event) == -1) {
         perror("epoll_ctl - client_thread");
         return NULL;
     }
 
-    //Initialize varibles for RTT and throughput calculations
+    //Initializing varibles for RTT and throughput calculations
     data->total_rtt = 0;
     data->total_messages = 0;
     data->request_rate = 0.0f;
@@ -379,11 +379,11 @@ void run_server() {
                                        (struct sockaddr *)&client_addr,
                                        &client_len);
                 if (client_fd < 0) {
-                    perror("accept");
+                    perror("accept()");
                     continue;
                 }
 
-                printf("Accepted new client: fd = %d\n", client_fd);
+                printf("Client connection established with fd = %d\n", client_fd);
 
                 // Register new client socket to epoll
                 struct epoll_event client_ev;
@@ -396,7 +396,7 @@ void run_server() {
 
             } else {
 
-                
+                //Case 1: Existing client sent data or disconnected
                 // Existing client sent data
                 int n = recv(fd, buffer, MESSAGE_SIZE, 0);
                 if (n <= 0) { // n  = 0 - client closed connection
@@ -404,7 +404,7 @@ void run_server() {
                     if (n < 0) {
                         perror("recv");
                     }
-                    printf("Client disconnected: fd = %d\n", fd);
+                    printf("Closed connection with client %d\n", fd);
 
                     //Remove client form epoll 
                     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
@@ -413,7 +413,7 @@ void run_server() {
                     // n > 0 - data recieved
                     // Echo message back to client
                     send(fd, buffer, n, 0);
-                    printf("Received %d bytes from client fd=%d, echoing back\n", n, fd);
+                    printf("sent %d bytes back to client fd = %d\n", n, fd );
                 }
             }
         }
@@ -440,3 +440,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
